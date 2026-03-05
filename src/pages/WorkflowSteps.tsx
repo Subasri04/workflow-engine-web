@@ -218,17 +218,17 @@ const WorkflowSteps = () => {
               />
             </div>
 
-            <div className="flex justify-end gap-3 mt-6">
+            <div className="flex gap-3 mt-6 justify-between">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded"
+                className="rounded text-body bg-neutral-primary border border-default leading-5 rounded-base text-sm px-4 py-2.5"
               >
                 Cancel
               </button>
 
               <button
                 onClick={handleAddStep}
-                className="px-4 py-2 bg-green-600 text-white rounded"
+                className="bg-blue-600 text-white px-4 py-2 rounded"
               >
                 Save
               </button>
@@ -277,7 +277,7 @@ const WorkflowSteps = () => {
             <div className="flex justify-between mt-6">
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded"
+                className="px-2 py-2 bg-red-600 text-white rounded"
               >
                 Delete
               </button>
@@ -287,21 +287,21 @@ const WorkflowSteps = () => {
                   onClick={() =>
                     navigate(`/steps/${selectedStep._id}/rules`)
                   }
-                  className="px-4 py-2 bg-indigo-600 text-white rounded"
+                  className="px-2 py-2 bg-indigo-600 text-white rounded"
                 >
                   Manage Rules
                 </button>
 
                 <button
                   onClick={() => setSelectedStep(null)}
-                  className="px-4 py-2 bg-gray-300 rounded"
+                  className="px-2 py-2 bg-gray-300 rounded"
                 >
                   Cancel
                 </button>
 
                 <button
                   onClick={handleUpdate}
-                  className="px-4 py-2 bg-green-600 text-white rounded"
+                  className="px-4 py-2 bg-blue-600 text-white rounded text-sm"
                 >
                   Save
                 </button>

@@ -15,7 +15,7 @@ function App() {
       <Route path="/workflows" element={<Workflows />} />
       <Route path="/workflows/create" element={<CreateWorkflow />} />
       <Route path="/workflows/:id/edit" element={<EditWorkflow />} />
-      <Route path="/workflows/:id" element={<WorkflowSteps />} />
+      <Route path="/workflows/:id/steps" element={<WorkflowSteps />} />
       <Route path="/executions/start/:workflowId" element={<ExecutionStart />} />
       <Route path="/executions" element={<Executions />} />
       <Route path="/executions/:id" element={<ExecutionDetail />} />

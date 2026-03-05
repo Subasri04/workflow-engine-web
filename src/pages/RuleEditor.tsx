@@ -13,7 +13,7 @@ const RuleEditor = () => {
   const [steps, setSteps] = useState<Step[]>([]);
   const [condition, setCondition] = useState("");
   const [nextStepId, setNextStepId] = useState("");
-  const [priority, setPriority] = useState(1);
+  const [priority, setPriority] = useState();
   const [loading, setLoading] = useState(false);
 
   const loadData = useCallback(async () => {

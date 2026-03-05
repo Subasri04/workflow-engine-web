@@ -1,27 +1,36 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getWorkflows } from "../api/workflow.api";
+import { getWorkflowById } from "../api/workflow.api";
 import { startExecution } from "../api/execution.api";
-import type { Workflow, InputFieldConfig } from "../types/workflow.types";
+import type { Workflow } from "../types/workflow.types";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type InputValue = string | number | boolean;
 
 function ExecutionStart() {
     const { workflowId } = useParams<{ workflowId: string }>();
+    const navigate = useNavigate();
 
-    const { data: workflows } = useQuery<Workflow[]>({
-        queryKey: ["workflows"],
-        queryFn: getWorkflows
+    const { data: workflow, isLoading } = useQuery<Workflow>({
+        queryKey: ["workflow", workflowId],
+        queryFn: () => getWorkflowById(workflowId as string),
+        enabled: !!workflowId
     });
-
-    const workflow = workflows?.find((w) => w._id === workflowId);
 
     const [formData, setFormData] = useState<Record<string, InputValue>>({});
 
     const mutation = useMutation({
         mutationFn: startExecution
     });
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                Loading workflow...
+            </div>
+        );
+    }
 
     if (!workflow) {
         return (
@@ -43,35 +52,43 @@ function ExecutionStart() {
             workflow_id: workflow._id,
             data: formData
         });
+        navigate('/')
     };
+
+    const schema = workflow.input_schema ?? {};
 
     return (
         <div className="min-h-screen bg-gray-50 px-10 py-10">
+
             <h1 className="text-2xl font-semibold mb-8">
                 Start Workflow Execution
             </h1>
 
             <div className="bg-white p-6 rounded-xl shadow-sm max-w-xl">
-                {Object.entries(workflow.input_schema).map(([field, config]) => {
-                    let type: string;
-                    let allowed: string[] | undefined;
 
-                    if (typeof config === "string") {
-                        type = config;
-                    } else {
-                        const cfg = config as InputFieldConfig;
-                        type = cfg.type;
-                        allowed = cfg.allowed_values;
-                    }
+                {Object.keys(schema).length === 0 && (
+                    <div className="text-gray-500">
+                        No input schema defined
+                    </div>
+                )}
+
+                {Object.entries(schema).map(([field, config]: any) => {
+
+                    const allowed =
+                        config && typeof config === "object" && "allowed_values" in config
+                            ? config.allowed_values
+                            : undefined;
 
                     return (
                         <div key={field} className="mb-4">
+
                             <label className="block text-sm mb-2">
                                 {field}
                             </label>
 
                             {allowed ? (
                                 <select
+                                    value={formData[field] ?? ""}
                                     onChange={(e) =>
                                         handleChange(field, e.target.value)
                                     }
@@ -79,15 +96,16 @@ function ExecutionStart() {
                                 >
                                     <option value="">Select</option>
 
-                                    {allowed.map((val) => (
+                                    {allowed.map((val: string) => (
                                         <option key={val} value={val}>
                                             {val}
                                         </option>
                                     ))}
                                 </select>
-                            ) : type === "number" ? (
+                            ) : config.type === "number" ? (
                                 <input
                                     type="number"
+                                    value={formData[field] ?? ""}
                                     onChange={(e) =>
                                         handleChange(
                                             field,
@@ -96,29 +114,17 @@ function ExecutionStart() {
                                     }
                                     className="w-full border rounded-md px-3 py-2"
                                 />
-                            ) : type === "boolean" ? (
-                                <select
-                                    onChange={(e) =>
-                                        handleChange(
-                                            field,
-                                            e.target.value === "true"
-                                        )
-                                    }
-                                    className="w-full border rounded-md px-3 py-2"
-                                >
-                                    <option value="">Select</option>
-                                    <option value="true">True</option>
-                                    <option value="false">False</option>
-                                </select>
                             ) : (
                                 <input
                                     type="text"
+                                    value={formData[field] ?? ""}
                                     onChange={(e) =>
                                         handleChange(field, e.target.value)
                                     }
                                     className="w-full border rounded-md px-3 py-2"
                                 />
                             )}
+
                         </div>
                     );
                 })}
@@ -129,7 +135,9 @@ function ExecutionStart() {
                 >
                     Start Execution
                 </button>
+
             </div>
+
         </div>
     );
 }
